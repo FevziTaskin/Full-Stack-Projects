@@ -7,6 +7,8 @@ import Navbar from "./components/navbar/Navbar";
 import Leftbar from "./components/leftbar/Leftbar";
 import Rightbar from "./components/rightbar/Rightbar";
 
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
 import "./style.scss";
 
 import {
@@ -24,18 +26,22 @@ function App() {
   const { currentUser } = useContext(AuthContext);
   const { darkMode } = useContext(DarkModeContext);
 
+  const queryClient = new QueryClient();
+
   const Layout = () => {
     return (
-      <div className={`theme-${darkMode ? "dark" : "light"}`}>
-        <Navbar />
-        <main style={{ display: "flex" }}>
-          <Leftbar />
-          <div style={{ flex: 6 }}>
-            <Outlet />
-          </div>
-          <Rightbar />
-        </main>
-      </div>
+      <QueryClientProvider client={queryClient}>
+        <div className={`theme-${darkMode ? "dark" : "light"}`}>
+          <Navbar />
+          <main style={{ display: "flex" }}>
+            <Leftbar />
+            <div style={{ flex: 6 }}>
+              <Outlet />
+            </div>
+            <Rightbar />
+          </main>
+        </div>
+      </QueryClientProvider>
     );
   };
 
