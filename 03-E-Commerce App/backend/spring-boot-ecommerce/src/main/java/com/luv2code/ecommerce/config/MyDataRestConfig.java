@@ -1,6 +1,13 @@
 package com.luv2code.ecommerce.config;
 
-import com.luv2code.ecommerce.entity.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
+import javax.persistence.EntityManager;
+import javax.persistence.criteria.Order;
+import javax.persistence.metamodel.EntityType;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
@@ -9,17 +16,16 @@ import org.springframework.data.rest.webmvc.config.RepositoryRestConfigurer;
 import org.springframework.http.HttpMethod;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 
-import javax.persistence.EntityManager;
-import javax.persistence.metamodel.EntityType;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import com.luv2code.ecommerce.entity.Country;
+import com.luv2code.ecommerce.entity.Product;
+import com.luv2code.ecommerce.entity.ProductCategory;
+import com.luv2code.ecommerce.entity.State;
 
 @Configuration
 public class MyDataRestConfig implements RepositoryRestConfigurer {
 
     @Value("${allowed.origins}")
-    private String[] theAllowedOrigins;
+    private String[] allowedOrigins;
 
     private EntityManager entityManager;
 
@@ -28,14 +34,12 @@ public class MyDataRestConfig implements RepositoryRestConfigurer {
         entityManager = theEntityManager;
     }
 
-
     @Override
     public void configureRepositoryRestConfiguration(RepositoryRestConfiguration config, CorsRegistry cors) {
 
-        HttpMethod[] theUnsupportedActions = {HttpMethod.PUT, HttpMethod.POST,
-                                              HttpMethod.DELETE, HttpMethod.PATCH};
+        HttpMethod[] theUnsupportedActions = { HttpMethod.PUT, HttpMethod.POST, HttpMethod.DELETE, HttpMethod.PATCH };
 
-        // disable HTTP methods for ProductCategory: PUT, POST, DELETE and PATCH
+        // disable HTTP methods for ProductCategory: PUT, POST and DELETE
         disableHttpMethods(Product.class, config, theUnsupportedActions);
         disableHttpMethods(ProductCategory.class, config, theUnsupportedActions);
         disableHttpMethods(Country.class, config, theUnsupportedActions);
@@ -46,10 +50,11 @@ public class MyDataRestConfig implements RepositoryRestConfigurer {
         exposeIds(config);
 
         // configure cors mapping
-        cors.addMapping(config.getBasePath() + "/**").allowedOrigins(theAllowedOrigins);
+        cors.addMapping(config.getBasePath() + "/**").allowedOrigins(allowedOrigins);
     }
 
-    private void disableHttpMethods(Class theClass, RepositoryRestConfiguration config, HttpMethod[] theUnsupportedActions) {
+    private void disableHttpMethods(Class theClass, RepositoryRestConfiguration config,
+            HttpMethod[] theUnsupportedActions) {
         config.getExposureConfiguration()
                 .forDomainType(theClass)
                 .withItemExposure((metdata, httpMethods) -> httpMethods.disable(theUnsupportedActions))
@@ -77,12 +82,3 @@ public class MyDataRestConfig implements RepositoryRestConfigurer {
         config.exposeIdsFor(domainTypes);
     }
 }
-
-
-
-
-
-
-
-
-
